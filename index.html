@@ -1,47 +1,826 @@
----
-layout: page
-headerTitle: "Where Amazing Happens"
-description: "Talk is cheap. Show me the code. "
----
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parsifal - iOS Developer & Tech Enthusiast</title>
+    <meta name="description" content="Personal website of Parsifal, an iOS developer and tech enthusiast.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* CSS Custom Properties based on OpenCode design system */
+        :root {
+            --color-bg: #201d1d;
+            --color-bg-elevated: #302c2c;
+            --color-text: #fdfcfc;
+            --color-text-secondary: #9a9898;
+            --color-text-muted: #6e6e73;
+            --color-accent: #007aff;
+            --color-accent-hover: #0056b3;
+            --color-accent-active: #004085;
+            --color-border: rgba(15, 0, 0, 0.12);
+            --color-border-outline: #646262;
+            --color-success: #30d158;
+            --color-warning: #ff9f0a;
+            --color-danger: #ff3b30;
+            
+            /* Typography */
+            --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+            
+            /* Spacing */
+            --space-1: 4px;
+            --space-2: 8px;
+            --space-3: 12px;
+            --space-4: 16px;
+            --space-5: 20px;
+            --space-6: 24px;
+            --space-8: 32px;
+            --space-10: 40px;
+            --space-12: 48px;
+            --space-16: 64px;
+            --space-20: 80px;
+            --space-24: 96px;
+            
+            /* Border Radius */
+            --radius-sm: 4px;
+            --radius-md: 6px;
+        }
 
-{% for post in paginator.posts %}
-<div class="post-preview">
-    <a href="{{ post.url | prepend: site.baseurl }}">
-        <h2 class="post-title">
-            {{ post.title }}
-        </h2>
-        {% if post.subtitle %}
-        <h3 class="post-subtitle">
-            {{ post.subtitle }}
-        </h3>
-        {% endif %}
-        <div class="post-content-preview">
-            {% if post.abstract %}
-            {{ post.abstract | strip_html | truncate:200 }}
-            {% else %}
-            {{ post.content | strip_html | truncate:200 }}
-            {% endif %}
+        /* Reset & Base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-mono);
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.5;
+            font-size: 16px;
+            font-weight: 400;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Typography */
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        h1 {
+            font-size: 2.375rem; /* 38px */
+        }
+
+        h2 {
+            font-size: 1.5rem; /* 24px */
+            margin-bottom: var(--space-6);
+        }
+
+        h3 {
+            font-size: 1.125rem; /* 18px */
+            margin-bottom: var(--space-4);
+        }
+
+        p {
+            margin-bottom: var(--space-4);
+            color: var(--color-text-secondary);
+        }
+
+        a {
+            color: var(--color-text);
+            text-decoration: underline;
+            text-decoration-color: var(--color-border-outline);
+            text-underline-offset: 2px;
+            transition: color 0.15s ease, text-decoration-color 0.15s ease;
+        }
+
+        a:hover {
+            color: var(--color-accent);
+            text-decoration-color: var(--color-accent);
+        }
+
+        /* Layout */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 var(--space-6);
+        }
+
+        section {
+            padding: var(--space-24) 0;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        section:last-child {
+            border-bottom: none;
+        }
+
+        /* Navigation */
+        nav {
+            position: sticky;
+            top: 0;
+            background-color: var(--color-bg);
+            border-bottom: 1px solid var(--color-border);
+            z-index: 100;
+            padding: var(--space-4) 0;
+        }
+
+        nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            font-weight: 700;
+            font-size: 1.125rem;
+            color: var(--color-text);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: var(--space-6);
+            list-style: none;
+        }
+
+        .nav-links a {
+            font-weight: 500;
+            font-size: 1rem;
+            color: var(--color-text-secondary);
+            text-decoration: none;
+            transition: color 0.15s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--color-text);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: var(--space-24) 0;
+            text-align: center;
+        }
+
+        .hero-terminal {
+            background-color: var(--color-bg-elevated);
+            border: 1px solid var(--color-border-outline);
+            border-radius: var(--radius-sm);
+            padding: var(--space-6);
+            margin-bottom: var(--space-8);
+            text-align: left;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .terminal-header {
+            display: flex;
+            gap: var(--space-2);
+            margin-bottom: var(--space-4);
+        }
+
+        .terminal-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .terminal-dot.red { background-color: var(--color-danger); }
+        .terminal-dot.yellow { background-color: var(--color-warning); }
+        .terminal-dot.green { background-color: var(--color-success); }
+
+        .terminal-content {
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+
+        .terminal-line {
+            margin-bottom: var(--space-1);
+        }
+
+        .terminal-prompt {
+            color: var(--color-success);
+        }
+
+        .terminal-command {
+            color: var(--color-text);
+        }
+
+        .terminal-comment {
+            color: var(--color-text-muted);
+        }
+
+        .hero h1 {
+            margin-bottom: var(--space-6);
+        }
+
+        .hero-subtitle {
+            font-size: 1.125rem;
+            color: var(--color-text-secondary);
+            max-width: 600px;
+            margin: 0 auto var(--space-8);
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: var(--space-4);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-2) var(--space-5);
+            font-family: var(--font-mono);
+            font-size: 1rem;
+            font-weight: 500;
+            line-height: 2;
+            border-radius: var(--radius-sm);
+            text-decoration: none;
+            transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+
+        .btn-primary {
+            background-color: var(--color-accent);
+            color: white;
+            border-color: var(--color-accent);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--color-accent-hover);
+            border-color: var(--color-accent-hover);
+            color: white;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--color-text);
+            border-color: var(--color-border-outline);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--color-bg-elevated);
+            border-color: var(--color-text);
+        }
+
+        /* About Section */
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: var(--space-8);
+        }
+
+        .about-text {
+            order: 2;
+        }
+
+        .about-image {
+            order: 1;
+            text-align: center;
+        }
+
+        .ascii-art {
+            font-size: 0.625rem;
+            line-height: 1.2;
+            color: var(--color-text-secondary);
+            white-space: pre;
+            overflow-x: auto;
+        }
+
+        /* Skills Section */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--space-6);
+        }
+
+        .skill-category {
+            background-color: var(--color-bg-elevated);
+            border: 1px solid var(--color-border-outline);
+            border-radius: var(--radius-sm);
+            padding: var(--space-6);
+        }
+
+        .skill-category h3 {
+            color: var(--color-accent);
+            margin-bottom: var(--space-4);
+            font-size: 1rem;
+        }
+
+        .skill-list {
+            list-style: none;
+        }
+
+        .skill-list li {
+            padding: var(--space-2) 0;
+            color: var(--color-text-secondary);
+            font-size: 0.875rem;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .skill-list li:last-child {
+            border-bottom: none;
+        }
+
+        .skill-tag {
+            display: inline-block;
+            background-color: var(--color-bg);
+            border: 1px solid var(--color-border-outline);
+            border-radius: var(--radius-sm);
+            padding: var(--space-1) var(--space-2);
+            font-size: 0.75rem;
+            margin: var(--space-1);
+            color: var(--color-text-secondary);
+        }
+
+        /* Projects Section */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--space-6);
+        }
+
+        .project-card {
+            background-color: var(--color-bg-elevated);
+            border: 1px solid var(--color-border-outline);
+            border-radius: var(--radius-sm);
+            padding: var(--space-6);
+            transition: border-color 0.15s ease;
+        }
+
+        .project-card:hover {
+            border-color: var(--color-accent);
+        }
+
+        .project-card h3 {
+            color: var(--color-text);
+            margin-bottom: var(--space-2);
+        }
+
+        .project-card p {
+            font-size: 0.875rem;
+            margin-bottom: var(--space-4);
+        }
+
+        .project-tech {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-2);
+            margin-bottom: var(--space-4);
+        }
+
+        .project-links {
+            display: flex;
+            gap: var(--space-4);
+        }
+
+        .project-links a {
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        /* Contact Section */
+        .contact-content {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .contact-methods {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-8);
+            margin-top: var(--space-8);
+            flex-wrap: wrap;
+        }
+
+        .contact-item {
+            text-align: center;
+        }
+
+        .contact-item h4 {
+            color: var(--color-accent);
+            margin-bottom: var(--space-2);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .contact-item a {
+            font-size: 1rem;
+        }
+
+        /* Footer */
+        footer {
+            padding: var(--space-8) 0;
+            text-align: center;
+            border-top: 1px solid var(--color-border);
+        }
+
+        footer p {
+            font-size: 0.875rem;
+            color: var(--color-text-muted);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.75rem;
+            }
+            
+            .hero-terminal {
+                padding: var(--space-4);
+            }
+            
+            .nav-links {
+                display: none; /* Simple hide for mobile, could add hamburger menu */
+            }
+            
+            .about-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .skills-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .contact-methods {
+                flex-direction: column;
+                gap: var(--space-6);
+            }
+        }
+
+        /* Animations */
+        .typing-animation {
+            display: inline-block;
+            overflow: hidden;
+            border-right: 2px solid var(--color-success);
+            white-space: nowrap;
+            animation: typing 3s steps(40, end), blink-caret 0.75s step-end infinite;
+            max-width: 100%;
+        }
+
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: var(--color-success); }
+        }
+
+        /* Terminal cursor blink */
+        .cursor-blink {
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="container">
+            <a href="#" class="nav-brand">parsifal@izmw:~$</a>
+            <ul class="nav-links">
+                <li><a href="#about">关于</a></li>
+                <li><a href="#skills">技能</a></li>
+                <li><a href="#projects">项目</a></li>
+                <li><a href="#contact">联系</a></li>
+            </ul>
         </div>
-    </a>
-    <p class="post-meta">
-        Posted by {% if post.author %}{{ post.author }}{% else %}{{ site.title }}{% endif %} on {{ post.date | date: "%B %-d, %Y" }}
-    </p>
-</div>
-<hr>
-{% endfor %}
+    </nav>
 
-<!-- Pager -->
-{% if paginator.total_pages > 1 %}
-<ul class="pager">
-    {% if paginator.previous_page %}
-    <li class="previous">
-        <a href="{{ paginator.previous_page_path | prepend: site.baseurl | replace: '//', '/' }}">&larr; Newer Posts</a>
-    </li>
-    {% endif %}
-    {% if paginator.next_page %}
-    <li class="next">
-        <a href="{{ paginator.next_page_path | prepend: site.baseurl | replace: '//', '/' }}">Older Posts &rarr;</a>
-    </li>
-    {% endif %}
-</ul>
-{% endif %}
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-terminal">
+                <div class="terminal-header">
+                    <div class="terminal-dot red"></div>
+                    <div class="terminal-dot yellow"></div>
+                    <div class="terminal-dot green"></div>
+                </div>
+                <div class="terminal-content">
+                    <div class="terminal-line">
+                        <span class="terminal-comment"># 欢迎来到我的数字空间</span>
+                    </div>
+                    <div class="terminal-line">
+                        <span class="terminal-prompt">parsifal@izmw:~$</span>
+                        <span class="terminal-command"> whoami</span>
+                    </div>
+                    <div class="terminal-line">
+                        <span class="terminal-command">iOS Developer & Tech Enthusiast</span>
+                    </div>
+                    <div class="terminal-line">
+                        <span class="terminal-prompt">parsifal@izmw:~$</span>
+                        <span class="terminal-command"> cat skills.txt</span>
+                    </div>
+                    <div class="terminal-line">
+                        <span class="terminal-command">Swift, Objective-C, SwiftUI, UIKit, Python, Docker, AI/ML</span>
+                    </div>
+                    <div class="terminal-line">
+                        <span class="terminal-prompt">parsifal@izmw:~$</span>
+                        <span class="terminal-command"> <span class="cursor-blink">█</span></span>
+                    </div>
+                </div>
+            </div>
+            
+            <h1>你好，我是 Parsifal</h1>
+            <p class="hero-subtitle">
+                一名热爱技术的 iOS 开发者，专注于构建优雅、高效的应用程序。
+                喜欢探索新技术，拥抱开源，用代码创造价值。
+            </p>
+            
+            <div class="hero-buttons">
+                <a href="#projects" class="btn btn-primary">查看项目</a>
+                <a href="#contact" class="btn btn-outline">联系我</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about">
+        <div class="container">
+            <h2>关于我</h2>
+            <div class="about-content">
+                <div class="about-text">
+                    <p>
+                        我是一名经验丰富的 iOS 开发者，拥有多年的移动应用开发经验。
+                        热衷于使用 Swift 和现代 iOS 技术栈构建高质量的应用程序。
+                    </p>
+                    <p>
+                        除了 iOS 开发，我也对人工智能、机器学习和自动化工具充满兴趣。
+                        相信技术能够改变世界，致力于通过开源项目和知识分享推动技术社区的发展。
+                    </p>
+                    <p>
+                        当我不在编写代码时，你可能会发现我在探索新的技术趋势、阅读技术文档，
+                        或者尝试将 AI 工具集成到开发工作流中。
+                    </p>
+                </div>
+                <div class="about-image">
+                    <div class="ascii-art">
+    ██████╗ █████╗ ██████╗ ███████╗██╗███████╗██╗      █████╗ ██╗     
+    ██╔══██╗██╔══██╗██╔══██╗██╔════╝██║██╔════╝██║     ██╔══██╗██║     
+    ██████╔╝███████║██████╔╝█████╗  ██║███████╗██║     ███████║██║     
+    ██╔═══╝ ██╔══██║██╔══██╗██╔══╝  ██║╚════██║██║     ██╔══██║██║     
+    ██║     ██║  ██║██║  ██║██║     ██║███████║███████╗██║  ██║███████╗
+    ╚═╝     ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝     ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝╚══════╝
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section id="skills">
+        <div class="container">
+            <h2>技能栈</h2>
+            <div class="skills-grid">
+                <div class="skill-category">
+                    <h3>// iOS 开发</h3>
+                    <ul class="skill-list">
+                        <li>Swift & SwiftUI</li>
+                        <li>Objective-C & UIKit</li>
+                        <li>Core Data & CloudKit</li>
+                        <li>ARKit & Core ML</li>
+                        <li>Xcode & Instruments</li>
+                    </ul>
+                </div>
+                
+                <div class="skill-category">
+                    <h3>// 后端 & 工具</h3>
+                    <ul class="skill-list">
+                        <li>Python & Flask/Django</li>
+                        <li>Docker & Kubernetes</li>
+                        <li>REST APIs & GraphQL</li>
+                        <li>Git & GitHub Actions</li>
+                        <li>CI/CD 自动化</li>
+                    </ul>
+                </div>
+                
+                <div class="skill-category">
+                    <h3>// AI & 机器学习</h3>
+                    <ul class="skill-list">
+                        <li>TensorFlow & PyTorch</li>
+                        <li>Core ML & Create ML</li>
+                        <li>Hugging Face Transformers</li>
+                        <li>LLM 集成与优化</li>
+                        <li>计算机视觉</li>
+                    </ul>
+                </div>
+                
+                <div class="skill-category">
+                    <h3>// 其他技能</h3>
+                    <ul class="skill-list">
+                        <li>技术写作与文档</li>
+                        <li>开源社区贡献</li>
+                        <li>敏捷开发方法</li>
+                        <li>性能优化</li>
+                        <li>用户体验设计</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div style="margin-top: var(--space-8);">
+                <h3>技术标签</h3>
+                <div>
+                    <span class="skill-tag">Swift</span>
+                    <span class="skill-tag">SwiftUI</span>
+                    <span class="skill-tag">Objective-C</span>
+                    <span class="skill-tag">UIKit</span>
+                    <span class="skill-tag">Python</span>
+                    <span class="skill-tag">Docker</span>
+                    <span class="skill-tag">AI/ML</span>
+                    <span class="skill-tag">Git</span>
+                    <span class="skill-tag">REST APIs</span>
+                    <span class="skill-tag">Core Data</span>
+                    <span class="skill-tag">ARKit</span>
+                    <span class="skill-tag">TensorFlow</span>
+                    <span class="skill-tag">PyTorch</span>
+                    <span class="skill-tag">Hugging Face</span>
+                    <span class="skill-tag">CI/CD</span>
+                    <span class="skill-tag">Agile</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects">
+        <div class="container">
+            <h2>开源项目</h2>
+            <div class="projects-grid">
+                <div class="project-card">
+                    <h3>CPCollectionViewKit</h3>
+                    <p>有趣的 UICollectionView 布局和转场动画集合，提供多种自定义布局和流畅的动画效果。</p>
+                    <div class="project-tech">
+                        <span class="skill-tag">Swift</span>
+                        <span class="skill-tag">UIKit</span>
+                        <span class="skill-tag">UICollectionView</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/ParsifalC/CPCollectionViewKit" target="_blank">GitHub</a>
+                        <a href="#" target="_blank">文档</a>
+                    </div>
+                </div>
+                
+                <div class="project-card">
+                    <h3>wxocr</h3>
+                    <p>将微信 OCR 功能封装为简单的 REST API 服务，支持 Docker 部署，方便集成到各种应用中。</p>
+                    <div class="project-tech">
+                        <span class="skill-tag">Python</span>
+                        <span class="skill-tag">Docker</span>
+                        <span class="skill-tag">REST API</span>
+                        <span class="skill-tag">OCR</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/ParsifalC/wxocr" target="_blank">GitHub</a>
+                        <a href="#" target="_blank">文档</a>
+                    </div>
+                </div>
+                
+                <div class="project-card">
+                    <h3>dify2openai</h3>
+                    <p>将 Dify 转换为 OpenAI 兼容的 API 接口，方便在现有系统中集成 Dify 的能力。</p>
+                    <div class="project-tech">
+                        <span class="skill-tag">Python</span>
+                        <span class="skill-tag">API</span>
+                        <span class="skill-tag">OpenAI</span>
+                        <span class="skill-tag">Dify</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/ParsifalC/dify2openai" target="_blank">GitHub</a>
+                        <a href="#" target="_blank">文档</a>
+                    </div>
+                </div>
+                
+                <div class="project-card">
+                    <h3>ion-ios-filesystem</h3>
+                    <p>原生 iOS 文件系统库，提供高性能的文件操作功能。</p>
+                    <div class="project-tech">
+                        <span class="skill-tag">Swift</span>
+                        <span class="skill-tag">iOS</span>
+                        <span class="skill-tag">File System</span>
+                    </div>
+                    <div class="project-links">
+                        <a href="https://github.com/ParsifalC/ion-ios-filesystem" target="_blank">GitHub</a>
+                        <a href="#" target="_blank">文档</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: var(--space-8);">
+                <a href="https://github.com/ParsifalC" target="_blank" class="btn btn-outline">
+                    在 GitHub 上查看所有项目 →
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact">
+        <div class="container">
+            <h2>联系我</h2>
+            <div class="contact-content">
+                <p>
+                    如果你对我的项目感兴趣，或者想要交流技术问题，欢迎通过以下方式联系我。
+                    我总是对有趣的对话和合作机会持开放态度。
+                </p>
+                
+                <div class="contact-methods">
+                    <div class="contact-item">
+                        <h4>GitHub</h4>
+                        <a href="https://github.com/ParsifalC" target="_blank">@ParsifalC</a>
+                    </div>
+                    
+                    <div class="contact-item">
+                        <h4>邮箱</h4>
+                        <a href="mailto:hello@izmw.me">hello@izmw.me</a>
+                    </div>
+                    
+                    <div class="contact-item">
+                        <h4>网站</h4>
+                        <a href="https://izmw.me" target="_blank">izmw.me</a>
+                    </div>
+                </div>
+                
+                <div style="margin-top: var(--space-8);">
+                    <p style="font-size: 0.875rem; color: var(--color-text-muted);">
+                        // 你也可以在 GitHub Issues 中提出问题或建议
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>© 2026 Parsifal. 用 ❤️ 和 ☕ 构建.</p>
+            <p style="margin-top: var(--space-2); font-size: 0.75rem;">
+                // 此网站使用纯 HTML/CSS 构建，无 JavaScript 框架依赖
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Simple smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add active class to navigation links on scroll
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('section[id]');
+            const navLinks = document.querySelectorAll('.nav-links a');
+            
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (scrollY >= (sectionTop - 200)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.style.color = '';
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.style.color = 'var(--color-text)';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
