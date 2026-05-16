@@ -1,0 +1,16 @@
+{
+    "name": "Parsifal - Full Stack Developer",
+    "short_name": "Parsifal",
+    "description": "全栈开发者个人网站",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#201d1d",
+    "theme_color": "#201d1d",
+    "icons": [
+        {
+            "src": "favicon.svg",
+            "sizes": "any",
+            "type": "image/svg+xml"
+        }
+    ]
+}
