@@ -6,6 +6,8 @@
 
 > **过去五年，大模型真正发生变化的，不只是参数规模和打榜跑分，更重要的是它在软件系统中的角色发生了根本性转变：它从一个单纯的文本生成函数（Text Generator），逐步演化为一个能够理解上下文、调用外部工具、执行复杂任务的运行时（Runtime）。而 API，正是这一演化过程最真实、最直观的镜子。**
 
+<img src="https://cdn.nlark.com/yuque/0/2026/png/229022/1782466145244-3a633f45-1188-4bdb-8d8c-fe61f58c18db.png" width="512" title="" crop="0,0,1,1" id="u8ac4d9dd" class="ne-image">
+
 如果把过去五年的 AI API 摆在一起看，你会发现一个很有意思的现象。
 
 2020 年的 GPT-3 API，结构极其简单，大概只有零星几个参数：
@@ -31,6 +33,8 @@ API 似乎变得越来越臃肿复杂了。很多开发者可能会抱怨：**AP
 
 ## 第一阶段：Completion API —— AI 只是一个文本生成器
 
+<img src="https://cdn.nlark.com/yuque/0/2026/png/229022/1782466195419-cc70b9c8-e2b0-49bf-b145-772a4166f05d.png" width="512" title="" crop="0,0,1,1" id="u540b66c1" class="ne-image">
+
 **示例请求 (Sample Payload):**
 ```json
 {
@@ -53,11 +57,15 @@ graph LR
 
 于是，业界诞生了一门玄学——Prompt Engineering（提示词工程）。
 
+<img src="https://cdn.nlark.com/yuque/0/2026/png/229022/1782466233480-73f994c5-20a0-41bb-92e6-63b070b859fa.png" width="512" title="" crop="0,0,1,1" id="u01ef1851" class="ne-image">
+
 事实上，今天我们在用的很多复杂的 System Prompt，本质上都是那个时代“硬编码”留下的遗产。**这一代 API 的设计，对应了那一代模型最原始的能力底色。**
 
 ---
 
 ## 第二阶段：Chat API —— 模型开始理解“对话与角色”
+
+<img src="https://cdn.nlark.com/yuque/0/2026/png/229022/1782466332577-a7c16943-bed2-4fd5-9391-3e50729c7473.png" width="512" title="" crop="0,0,1,1" id="zs05M" class="ne-image">
 
 **示例请求 (Sample Payload):**
 ```json
@@ -99,6 +107,8 @@ Chat API 的价值，不是把 `prompt` 改成了 `messages`，而是把原本�
 ---
 
 ## 第三阶段：Tool Calling —— 模型第一次拥有行动能力
+
+<img src="https://cdn.nlark.com/yuque/0/2026/png/229022/1782466368724-8e4a0f93-29b8-4859-8ba9-ae5552ca8bf3.png" width="512" title="" crop="0,0,1,1" id="ue1a5f4a8" class="ne-image">
 
 **示例请求 (Sample Payload):**
 ```json
@@ -145,6 +155,8 @@ Tool Calling 最大的变化，并不是“模型可以调用天气 API”。
 
 ## 第四阶段：Multimodal —— 统一世界模型（Unified Representation）
 
+<img src="https://cdn.nlark.com/yuque/0/2026/png/229022/1782466424604-f557c272-0203-4066-9b32-000a35cd6bfb.png" width="512" title="" crop="0,0,1,1" id="u34349f49" class="ne-image">
+
 **示例请求 (Sample Payload):**
 ```json
 {
@@ -182,6 +194,8 @@ API 中 `modalities` 的增加，本质上映射的是：**模型开始拥有统
 ---
 
 ## 第五阶段：Agent Runtime —— API 开始描述执行过程与环境
+
+<img src="https://cdn.nlark.com/yuque/0/2026/png/229022/1782466496833-18005461-eeff-42ef-91a0-157f1ad33fcc.png" width="512" title="" crop="0,0,1,1" id="ufdae500d" class="ne-image">
 
 **示例响应 (Sample Response):**
 ```json
@@ -240,6 +254,8 @@ API 每升级一次，模型就向“真正的程序”迈进一步。
 * **以前**：程序负责控制流程，模型只负责生成文本。
 * **今天**：模型负责控制流程，程序退化为只负责执行具体的原子动作。
 
+<img src="https://cdn.nlark.com/yuque/0/2026/png/229022/1782466555216-ad095e6c-9382-4a57-a18c-7d3c1d31ab34.png" width="512" title="" crop="0,0,1,1" id="u6ca3755c" class="ne-image">
+
 过去五年，API 其实一直在暗中做一件事：**不断把原来属于程序的职责，无缝迁移到模型中。** 我们可以看看这张对照表：
 
 | 原来属于传统程序的职责 | 今天属于大模型的职责 |
@@ -259,6 +275,8 @@ API 每升级一次，模型就向“真正的程序”迈进一步。
 ## 未来还会怎样？预测 API 的下一步
 
 因为 API 的设计永远滞后于模型能力的突破一点点，所以通过现在的瓶颈，我们大概能猜到 API 的下一步。
+
+<img src="https://cdn.nlark.com/yuque/0/2026/png/229022/1782466595797-cdfad2b5-9df8-48f0-954f-c5c98d647f96.png" width="512" title="" crop="0,0,1,1" id="u656081c7" class="ne-image">
 
 我认为未来三年，最核心的变化将是从 **命令式 (Imperative)** 走向 **声明式 (Declarative)**。
 
