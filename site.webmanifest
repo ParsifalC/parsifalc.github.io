@@ -1,16 +1,16 @@
 {
-    "name": "Parsifal - Full Stack Developer",
-    "short_name": "Parsifal",
-    "description": "全栈开发者个人网站",
-    "start_url": "/",
-    "display": "standalone",
-    "background_color": "#201d1d",
-    "theme_color": "#201d1d",
-    "icons": [
-        {
-            "src": "favicon.svg",
-            "sizes": "any",
-            "type": "image/svg+xml"
-        }
-    ]
+  "name": "Parsifal — The Construct",
+  "short_name": "Construct",
+  "description": "Parsifal 的可探索数字展馆",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#080e0b",
+  "theme_color": "#080e0b",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
 }

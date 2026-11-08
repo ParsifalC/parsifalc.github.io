@@ -1,0 +1,27 @@
+# Local dependencies and build output
+/node_modules/
+/dist/
+
+# macOS
+.DS_Store
+
+# Browser tests and generated screenshots
+/playwright-report/
+/playwright-output/
+/playwright-results/
+/blob-report/
+/test-results/
+/coverage/
+/screenshots/
+/test-screenshots/
+/tests/screenshots/
+/e2e/screenshots/
+**/__screenshots__/
+
+# Local credentials and research exports
+.env
+.env.*
+!.env.example
+/output/
+/github-private-*/
+/parsifal-redesign-*/

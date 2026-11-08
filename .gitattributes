@@ -1,0 +1,3 @@
+# Preserve the bundled upstream source without rewriting its indentation.
+vendor/*.js whitespace=-space-before-tab
+vendor/** linguist-vendored
