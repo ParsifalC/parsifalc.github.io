@@ -1,5 +1,6 @@
 import { profile, categories, projects, featuredProjects, getProject } from './content.js';
 import { projectArt } from './art.js';
+import { createSoundtrack, SOUNDTRACKS } from './soundtrack.js';
 
 const $ = selector => document.querySelector(selector);
 const escape = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -11,6 +12,7 @@ const coarsePointer = matchMedia('(pointer: coarse)');
 const settings = (() => { try { const saved=JSON.parse(localStorage.getItem('construct-settings')||'{}'); return {quality:['low','balanced','high'].includes(saved.quality)?saved.quality:'balanced',motion:['auto','reduced'].includes(saved.motion)?saved.motion:'auto'}; } catch { return {quality:'balanced',motion:'auto'}; } })();
 let world = null, explored = false, failed = false, nearest = null, filter = 'all', query = '', toastTimer;
 let lastFocus = null, sound = null, soundOn = false;
+let selectedTrack = 'green', travelMusicUntil = 0, travelMusicTimer;
 const accessLabels = {open:'开源作品',private:'独立项目 · 源码未公开',community:'社区贡献'};
 const category = id => categories.find(c=>c.id===id);
 const reduced = () => settings.motion==='reduced'||mediaMotion.matches;
@@ -38,10 +40,11 @@ function setExploring(value){
   $('#touch-controls').hidden=!value||failed||!(coarsePointer.matches||innerWidth<=760);
   $('#explore-hint').hidden=!value||failed;
   if(!value){$('#focus-exhibit').hidden=true;$('#location-label').textContent='00 / ARRIVAL';}
+  syncSound();
 }
 function enter(){if(failed){navigate('index');return;}if(!world){toast('空间正在准备，也可以先浏览作品。');return;}setExploring(true);world.start();canvas.focus({preventScroll:true});announce('已进入展馆。拖动观察，使用方向键移动，或点击展台。');}
-function travelTo(id){if(!getProject(id))return;if(failed){navigate('project/'+id);return;}clearPanel(true);if(!world){navigate('project/'+id);return;}setExploring(true);world.goTo(id);canvas.focus({preventScroll:true});announce('正在前往 '+getProject(id).title+' 展台。');}
-function goHome(){clearPanel(true);setExploring(false);world?.home();$('#enter-button').focus({preventScroll:true});}
+function travelTo(id){if(!getProject(id))return;if(failed||!world){navigate('project/'+id);return;}travelMusicUntil=performance.now()+4000;clearTimeout(travelMusicTimer);travelMusicTimer=setTimeout(()=>{travelMusicUntil=0;syncSound();},4000);clearPanel(true);setExploring(true);world.goTo(id);canvas.focus({preventScroll:true});announce('正在前往 '+getProject(id).title+' 展台。');}
+function goHome(){travelMusicUntil=0;clearTimeout(travelMusicTimer);clearPanel(true);setExploring(false);world?.home();$('#enter-button').focus({preventScroll:true});}
 
 function renderProject(project){
   panel.className='project-panel';$('#panel-path').textContent='EXHIBIT / '+project.number;
@@ -86,39 +89,71 @@ function renderAbout(contactOnly=false){
 }
 function renderSettings(){
   panel.className='compact';$('#panel-path').textContent='PREFERENCES';
-  content.innerHTML='<div class="panel-kicker">MAKE YOURSELF AT HOME</div><h2 id="panel-title" tabindex="-1">以舒服的方式探索。</h2><div class="setting-row"><div><label for="quality-setting">画面精细度</label><p>如果移动不够流畅，可以选择轻量模式。</p></div><select id="quality-setting"><option value="low">轻量</option><option value="balanced">均衡</option><option value="high">精细</option></select></div><div class="setting-row"><div><label for="motion-setting">减少动态效果</label><p>静止装置动画，并直接到达目的地。</p></div><input type="checkbox" id="motion-setting" '+(reduced()?'checked':'')+' '+(mediaMotion.matches?'disabled':'')+'></div><div class="setting-row"><div><label for="sound-setting">环境声音</label><p>低声的空间氛围，默认关闭。</p></div><input type="checkbox" id="sound-setting" '+(soundOn?'checked':'')+'></div><div class="control-reference"><span><kbd>W A S D</kbd> 或方向键移动</span><span><kbd>M</kbd> 展区地图</span><span><kbd>I</kbd> 作品索引</span><span><kbd>E</kbd> 查看附近展台</span><span><kbd>Esc</kbd> 关闭面板</span><span>拖动画面 · 调整视角</span></div><p class="setting-footnote">'+(mediaMotion.matches?'已遵循系统的减少动态效果设置。':'显示偏好会保存在当前浏览器。')+' 也可以完全通过地图和作品索引参观。</p>';
+  content.innerHTML='<div class="panel-kicker">MAKE YOURSELF AT HOME</div><h2 id="panel-title" tabindex="-1">以舒服的方式探索。</h2><div class="setting-row"><div><label for="quality-setting">画面精细度</label><p>如果移动不够流畅，可以选择轻量模式。</p></div><select id="quality-setting"><option value="low">轻量</option><option value="balanced">均衡</option><option value="high">精细</option></select></div><div class="setting-row"><div><label for="motion-setting">减少动态效果</label><p>静止装置动画，并直接到达目的地。</p></div><input type="checkbox" id="motion-setting" '+(reduced()?'checked':'')+' '+(mediaMotion.matches?'disabled':'')+'></div><div class="setting-row"><div><label for="sound-setting">环境声音</label><p>五首纯净音乐随场景切换，默认开启，可随时关闭。</p></div><input type="checkbox" id="sound-setting" '+(soundOn?'checked':'')+'></div><div class="control-reference"><span><kbd>W A S D</kbd> 或方向键移动</span><span><kbd>M</kbd> 展区地图</span><span><kbd>I</kbd> 作品索引</span><span><kbd>E</kbd> 查看附近展台</span><span><kbd>Esc</kbd> 关闭面板</span><span>拖动画面 · 调整视角</span></div><p class="setting-footnote">'+(mediaMotion.matches?'已遵循系统的减少动态效果设置。':'显示偏好会保存在当前浏览器。')+' 也可以完全通过地图和作品索引参观。</p>';
   $('#quality-setting').value=settings.quality;
   $('#quality-setting').addEventListener('change',e=>{settings.quality=e.target.value;saveSettings();world?.setQuality(settings.quality);});
   $('#motion-setting').addEventListener('change',e=>{settings.motion=e.target.checked?'reduced':'auto';saveSettings();applyMotion();});
   $('#sound-setting').addEventListener('change',()=>toggleSound());
-  content.insertAdjacentHTML('beforeend','<p><a class="text-button" href="music/">试听五种背景音乐 →</a></p>');
+  content.insertAdjacentHTML('beforeend','<p class="setting-footnote" id="sound-now"></p><p><a class="text-button" href="music/">试听五首纯净版音乐 →</a></p>');
+  updateSoundUI();
   content.insertAdjacentHTML('beforeend','<a class="text-button" href="'+(failed?'./':'?mode=lite#index')+'">'+(failed?'尝试空间模式':'切换至轻量浏览')+' →</a>');
+}
+function soundTrackForView(){
+  const hash=location.hash.slice(1);
+  if(hash==='settings')return selectedTrack;
+  if(hash==='map')return 'signal';
+  if(hash==='about'||hash==='contact')return 'human';
+  if(hash==='index'||hash.startsWith('project/'))return 'archive';
+  if(travelMusicUntil>performance.now())return 'signal';
+  return explored?'rain':'green';
+}
+function syncSound(){
+  selectedTrack=soundTrackForView();
+  sound?.select(selectedTrack);
 }
 function route(){
   let hash;try{hash=decodeURIComponent(location.hash.slice(1));}catch{hash='index';}
-  if(!hash){if(panel.open)panel.close();world?.setPaused(false);document.body.classList.remove('panel-open');if(lastFocus instanceof HTMLElement&&lastFocus.isConnected){lastFocus.focus({preventScroll:true});lastFocus=null;}return;}
+  if(!hash){if(panel.open)panel.close();world?.setPaused(false);document.body.classList.remove('panel-open');if(lastFocus instanceof HTMLElement&&lastFocus.isConnected){lastFocus.focus({preventScroll:true});lastFocus=null;}syncSound();return;}
   if(hash==='map')renderMap();else if(hash==='index')renderIndex();else if(hash==='about')renderAbout();else if(hash==='contact')renderAbout(true);else if(hash==='settings')renderSettings();else if(hash.startsWith('project/')&&getProject(hash.slice(8)))renderProject(getProject(hash.slice(8)));else{renderIndex();announce('未找到这个展项，已打开作品索引。');}
   if(!panel.open){lastFocus=lastFocus||document.activeElement;panel.showModal();}
-  document.body.classList.add('panel-open');world?.setPaused(true);content.scrollTop=0;$('#panel-title')?.focus({preventScroll:true});
+  document.body.classList.add('panel-open');world?.setPaused(true);content.scrollTop=0;$('#panel-title')?.focus({preventScroll:true});syncSound();
 }
 window.addEventListener('popstate',route);window.addEventListener('hashchange',route);
 panel.addEventListener('cancel',event=>{event.preventDefault();clearPanel();});
 panel.addEventListener('click',event=>{if(event.target!==panel)return;const r=panel.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)clearPanel();});
 
-function createSound(){
-  const AudioContext=window.AudioContext||window.webkitAudioContext;if(!AudioContext)return null;
-  const context=new AudioContext();const master=context.createGain();master.gain.value=0;master.connect(context.destination);
-  const oscillators=[55,82.41,110.12].map((frequency,i)=>{const o=context.createOscillator();const gain=context.createGain();o.type='sine';o.frequency.value=frequency;gain.gain.value=[.1,.035,.025][i];o.connect(gain);gain.connect(master);o.start();return o;});
-  return {context,master,oscillators};
+let audioState = {enabled:false,loading:false,track:null};
+function updateSoundUI(state=audioState){
+  audioState=state;soundOn=state.enabled;
+  const button=$('#sound-button');
+  const title=SOUNDTRACKS[state.track]?.title;
+  button.setAttribute('aria-pressed',String(soundOn));
+  button.setAttribute('aria-label',soundOn?'关闭环境声音':'开启环境声音');
+  button.setAttribute('aria-busy',String(state.loading));
+  button.title=soundOn?(state.waiting?'声音已开启，点击页面开始播放':state.loading?'正在准备音乐…':'正在播放：'+title):'开启随场景变化的背景音乐';
+  button.querySelector('span').textContent=soundOn?(state.waiting?'SOUND READY':state.loading?'LOADING…':'SOUND ON'):'SOUND OFF';
+  button.querySelector('svg').innerHTML=soundOn?'<path d="M4 8H1v4h3l5 4V4L4 8Zm8-2a6 6 0 0 1 0 8m-2-6a3 3 0 0 1 0 4"/>':'<path d="M4 8H1v4h3l5 4V4L4 8Zm9-1 5 6m0-6-5 6"/>';
+  if($('#sound-setting'))$('#sound-setting').checked=soundOn;
+  if($('#sound-now'))$('#sound-now').textContent=soundOn?(state.waiting?'声音已开启，点击页面后开始播放。':state.loading?'正在准备音乐…':'正在播放：'+title+' · 无底噪版'):'开启后，音乐会随参观场景自然过渡。';
 }
-async function toggleSound(){
-  try{if(!sound)sound=createSound();if(!sound){toast('当前浏览器暂不支持环境声音。');return;}await sound.context.resume();soundOn=!soundOn;sound.master.gain.setTargetAtTime(soundOn ? 0.2 : 0,sound.context.currentTime,.35);const b=$('#sound-button');b.setAttribute('aria-pressed',String(soundOn));b.setAttribute('aria-label',soundOn?'关闭环境声音':'开启环境声音');b.querySelector('span').textContent=soundOn?'SOUND ON':'SOUND OFF';if($('#sound-setting'))$('#sound-setting').checked=soundOn;}catch{toast('环境声音暂时不可用，其他功能不受影响。');}
+function initSound(){
+  if(!sound)sound=createSoundtrack({onState:updateSoundUI,onError:(_error,continuing)=>toast(continuing?'下一首暂未加载成功，继续播放当前音乐。':'音乐暂时无法播放，请再点一次声音开关。')});
+  syncSound();
+  sound.setHidden(document.hidden);
 }
-function clickSound(){if(!soundOn||!sound)return;const c=sound.context;const o=c.createOscillator();const g=c.createGain();o.frequency.setValueAtTime(540,c.currentTime);o.frequency.exponentialRampToValueAtTime(320,c.currentTime+.06);g.gain.setValueAtTime(.012,c.currentTime);g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+.065);o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+.07);}
-document.addEventListener('visibilitychange',()=>{if(sound)sound.master.gain.setTargetAtTime(document.hidden?0:soundOn ? 0.2 : 0,sound.context.currentTime,.15);});
+function toggleSound(){
+  sound.setEnabled(!soundOn);
+}
+document.addEventListener('visibilitychange',()=>sound?.setHidden(document.hidden));
+function unlockSound(event){
+  if(event.isTrusted&&!event.target.closest('[data-action="sound"],#sound-setting'))sound?.unlock();
+}
+document.addEventListener('pointerup',unlockSound,{capture:true});
+document.addEventListener('click',unlockSound,{capture:true});
+document.addEventListener('keydown',event=>{if(!event.metaKey&&!event.ctrlKey&&!event.altKey)unlockSound(event);},{capture:true});
 
 document.addEventListener('click',event=>{
-  const target=event.target.closest('[data-action]');if(!target)return;const action=target.dataset.action;event.preventDefault();clickSound();
+  const target=event.target.closest('[data-action]');if(!target)return;const action=target.dataset.action;event.preventDefault();
   if(action==='enter')enter();else if(action==='home')goHome();else if(['map','index','about','contact','settings'].includes(action))navigate(action);else if(action==='close')clearPanel();else if(action==='project')navigate('project/'+target.dataset.id);else if(action==='travel')travelTo(target.dataset.id);else if(action==='sound')toggleSound();
   else if(action==='filter'){filter=target.dataset.filter;document.querySelectorAll('.filter-button').forEach(b=>{const active=b.dataset.filter===filter;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));});projectRows();}
   else if(action==='reset-search'){filter='all';query='';renderIndex();$('#project-search').focus();}
@@ -152,6 +187,8 @@ function fallback(error){
   if(failed)return;failed=true;world?.dispose();world=null;document.body.classList.add('no-webgl');setExploring(false);$('#fallback-notice').hidden=false;$('#world-state').textContent='CONSTRUCT / LIGHT MODE';$('#load-status').textContent='轻量浏览已就绪';$('#enter-button').querySelector('span').textContent='浏览作品';$('#crosshair').hidden=true;canvas.dataset.ready='fallback';console.warn('The Construct: using the accessible gallery fallback.',error?.message||'');
 }
 
+initSound();
+sound.setEnabled(true);
 route();
 async function boot(){
   if(new URLSearchParams(location.search).get('mode')==='lite'){fallback();return;}
@@ -160,15 +197,5 @@ async function boot(){
 }
 boot();
 window.addEventListener('resize',()=>{$('#touch-controls').hidden=!explored||failed||!(coarsePointer.matches||innerWidth<=760);});
-window.addEventListener('pagehide',()=>{if(sound)sound.context.suspend();});
-window.addEventListener('pageshow',()=>{
-  if(!sound||!soundOn)return;
-  sound.context.resume().catch(()=>{
-    soundOn=false;
-    const button=$('#sound-button');
-    button.setAttribute('aria-pressed','false');
-    button.setAttribute('aria-label','开启环境声音');
-    button.querySelector('span').textContent='SOUND OFF';
-    if($('#sound-setting'))$('#sound-setting').checked=false;
-  });
-});
+window.addEventListener('pagehide',()=>sound?.setHidden(true));
+window.addEventListener('pageshow',()=>sound?.setHidden(document.hidden));
