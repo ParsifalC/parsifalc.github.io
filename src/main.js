@@ -91,6 +91,7 @@ function renderSettings(){
   $('#quality-setting').addEventListener('change',e=>{settings.quality=e.target.value;saveSettings();world?.setQuality(settings.quality);});
   $('#motion-setting').addEventListener('change',e=>{settings.motion=e.target.checked?'reduced':'auto';saveSettings();applyMotion();});
   $('#sound-setting').addEventListener('change',()=>toggleSound());
+  content.insertAdjacentHTML('beforeend','<p><a class="text-button" href="music/">试听五种背景音乐 →</a></p>');
   content.insertAdjacentHTML('beforeend','<a class="text-button" href="'+(failed?'./':'?mode=lite#index')+'">'+(failed?'尝试空间模式':'切换至轻量浏览')+' →</a>');
 }
 function route(){

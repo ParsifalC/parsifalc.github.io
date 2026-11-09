@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 
 const PROJECT_ROOT = fileURLToPath(new URL('../', import.meta.url));
 export const BUILD_ENTRIES = Object.freeze([
-  'index.html', 'src', 'vendor', 'assets', 'favicon.svg', 'site.webmanifest',
+  'index.html', 'music', 'src', 'vendor', 'assets', 'favicon.svg', 'site.webmanifest',
   'CNAME', '.nojekyll', 'robots.txt', 'sitemap.xml', 'docs',
 ]);
 const EXCLUDED_NAMES = new Set([
