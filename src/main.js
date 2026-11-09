@@ -1,6 +1,6 @@
 import { profile, categories, projects, featuredProjects, getProject } from './content.js';
 import { projectArt } from './art.js';
-import { createSoundtrack, SOUNDTRACKS } from './soundtrack.js';
+import { createSoundtrack, SOUNDTRACKS } from './soundtrack.js?v=quiet-threshold-1';
 
 const $ = selector => document.querySelector(selector);
 const escape = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));

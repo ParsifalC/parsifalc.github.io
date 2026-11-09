@@ -3,6 +3,7 @@ const players = [...document.querySelectorAll('audio')];
 for (const player of players) {
   const row = player.closest('.track');
   const status = row.querySelector('.play-status');
+  const idleText = status.textContent;
   player.volume = 0.8;
 
   player.addEventListener('play', () => {
@@ -18,7 +19,7 @@ for (const player of players) {
   });
   player.addEventListener('pause', () => {
     row.classList.remove('is-playing');
-    status.textContent = player.ended ? '试听结束 · 可再次播放' : player.currentTime > 0 ? '已暂停' : '24 秒试听';
+    status.textContent = player.ended ? '试听结束 · 可再次播放' : player.currentTime > 0 ? '已暂停' : idleText;
   });
   player.addEventListener('ended', () => {
     row.classList.remove('is-playing');

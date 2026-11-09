@@ -4,12 +4,14 @@
 
 | 文件前缀 | 场景 |
 | --- | --- |
-| 01-green-terminal | 入口 |
+| 01-quiet-threshold | 入口：静谧边界，64 秒无节拍循环 |
 | 02-rain-on-concrete | 自由漫游（保留原曲名，已无雨声） |
 | 03-signal-drift | 地图与前往展台 |
 | 04-archive-room | 作品索引与详情 |
 | 05-human-node | 关于与联系 |
 
-MP3 为 24 秒试听（44.1 kHz / 160 kbps，首尾淡入淡出）；同名前缀的 -loop.wav 为完整乐句循环（24 kHz / 16-bit / 立体声）。WAV 避免有损压缩首尾填充，音乐尾音在循环边界连续。
+入口 MP3 为 40 秒试听，其余为 24 秒试听（44.1 kHz / 160 kbps，首尾淡入淡出）；同名前缀的 -loop.wav 为完整乐句循环（24 kHz / 16-bit / 立体声）。WAV 避免有损压缩首尾填充，音乐尾音在循环边界连续。
 
-src/soundtrack.js 按需加载循环，2 秒交叉淡入淡出，已加载曲目保持播放相位；默认开启；自动播放受限时在首次交互后启动，可随时关闭。脚本 scripts/render-soundtracks.py 可复现素材，使用 numpy 与 ffmpeg，响度基准约 −20 LUFS，播放时再适度降低主音量。
+src/soundtrack.js 按需加载循环，2 秒交叉淡入淡出，已加载曲目保持播放相位；默认开启；自动播放受限时在首次交互后启动，可随时关闭。脚本 scripts/render-soundtracks.py 可复现素材，使用 numpy 与 ffmpeg，入口曲目响度约 −25 LUFS，其余约 −20 LUFS，播放时再适度降低主音量。
+
+入口曲目 Quiet Threshold / 静谧边界使用开放和弦、缓慢包络和圆周延迟尾音，不使用规律脉冲、尖锐波形或噪声。旧版 01-green-terminal 文件仅保留旧链接兼容，当前站点不再引用。
