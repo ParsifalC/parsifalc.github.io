@@ -13,7 +13,7 @@ import numpy as np
 SR = 24000
 ROOT = Path(__file__).resolve().parents[1] / 'assets' / 'audio'
 TRACKS = [
-    ('01-quiet-threshold', 64), ('02-rain-on-concrete', 16),
+    ('01-hidden-celesta-legato', 64), ('02-rain-on-concrete', 16),
     ('03-signal-drift', 12), ('04-archive-room', 16), ('05-human-node', 16),
 ]
 
@@ -52,60 +52,9 @@ def pluck(out, freq, start, length=1.4, amp=.11, pan=0):
     mix(out, round(start * SR), signal * envelope * amp, pan)
 
 
-def quiet_threshold():
-    """A seamless, unmetered 64-second cue: open chords and distant soft notes."""
-    period = 64 * SR
-    out = np.zeros((period, 2), dtype=np.float64)
-
-    def voice(freq, start, length, amp, pan, phase=0, attack=6, release=11):
-        t = np.arange(round(length * SR)) / SR
-        # Slow changes in timbre without rhythmic amplitude pulses or hiss.
-        angle = 2 * np.pi * freq * t + phase + .12 * np.sin(2 * np.pi * t / 29)
-        warmth = .12 + .045 * np.sin(2 * np.pi * t / 37 + phase)
-        signal = np.sin(angle) + warmth * np.sin(2 * angle) + .035 * np.sin(3 * angle)
-        envelope = np.sin(np.minimum(t / attack, 1) * np.pi / 2) ** 2
-        envelope *= np.sin(np.clip((length - t) / release, 0, 1) * np.pi / 2) ** 2
-        mono = signal * envelope * amp
-        stereo = np.column_stack((mono * math.sqrt((1 - pan) / 2),
-                                  mono * math.sqrt((1 + pan) / 2)))
-        first = round(start * SR) % period
-        count = min(len(stereo), period - first)
-        out[first:first + count] += stereo[:count]
-        if count < len(stereo):
-            out[:len(stereo) - count] += stereo[count:]
-
-    # D suspended/add9 → B-flat add9 → G minor/add9 → A suspended.
-    # No driving bass, percussion, sudden attacks or close dissonant intervals.
-    chords = [
-        [146.8324, 220, 329.6276, 523.2511],
-        [116.5409, 174.6141, 261.6256, 293.6648],
-        [97.9989, 146.8324, 220, 349.2282],
-        [110, 164.8138, 293.6648, 493.8833],
-    ]
-    for bar, chord in enumerate(chords):
-        for i, freq in enumerate(chord):
-            voice(freq, bar * 16 + [0, 1.1, 2.8, 4.3][i], 25 - i,
-                  [.045, .052, .028, .009][i], [-.18, .24, -.38, .36][i],
-                  phase=.57 * i + .29 * bar)
-    for freq, start, pan in [(440, 8, -.25), (349.2282, 25, .32),
-                             (391.9954, 42, -.3), (329.6276, 57, .25)]:
-        voice(freq, start, 13, .012, pan, attack=3.5, release=8)
-
-    # Circular, damped stereo reflections carry decay across the loop seam.
-    dry = out.copy()
-    for i in range(1, 33):
-        delay = round((.183 + i * .193 + .027 * math.sin(i * 2.1)) * SR)
-        source = dry[:, ::-1] if i % 2 else dry
-        out += np.roll(source, delay, axis=0) * (.072 * math.exp(-i / 12))
-    return out
-
-
 def render(number, duration):
     out = np.zeros((round(duration * SR), 2), dtype=np.float64)
-    if number == 1:
-        loop = quiet_threshold()
-        out = np.tile(loop, (math.ceil(len(out) / len(loop)), 1))[:len(out)]
-    elif number == 2:
+    if number == 2:
         # Keep the musical pad; omit rain, droplets, air and machine-hum layers.
         for start in np.arange(0, duration, 8):
             pad(out, [65.41, 98, 130.81], start, 8.5, .30)
@@ -160,6 +109,9 @@ def main():
         for number, (name, period) in enumerate(TRACKS, 1):
             if len(sys.argv) > 1 and number not in map(int, sys.argv[1:]):
                 continue
+            if number == 1:
+                subprocess.run([sys.executable, str(Path(__file__).with_name('render-hidden-celesta.py'))], check=True)
+                continue
             # A complete middle period includes the preceding phrase's decay.
             full = render(number, period * 3)
             loop = full[period * SR:2 * period * SR]
@@ -167,11 +119,11 @@ def main():
             wav(temp / 'loop.wav', loop)
             report = ffmpeg('-i', temp / 'loop.wav', '-af', 'loudnorm=print_format=json', '-f', 'null', '-')
             loudness = json.loads(re.search(r'\{[^{}]+\}', report.stderr).group())
-            target_lufs = -25 if number == 1 else -20
+            target_lufs = -20
             gain_db = target_lufs - float(loudness['input_i'])
             loop *= 10 ** (gain_db / 20)
             wav(ROOT / (name + '-loop.wav'), loop)
-            preview_seconds = 40 if number == 1 else 24
+            preview_seconds = 24
             preview = render(number, preview_seconds) * 10 ** (gain_db / 20)
             preview[:SR // 2] *= np.linspace(0, 1, SR // 2)[:, None]
             preview[-int(SR * 2.5):] *= np.linspace(1, 0, int(SR * 2.5))[:, None]

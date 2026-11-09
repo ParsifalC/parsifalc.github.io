@@ -1,5 +1,5 @@
 export const SOUNDTRACKS = Object.freeze({
-  green: { file: '01-quiet-threshold', title: '静谧边界' },
+  green: { file: '01-hidden-celesta-legato', title: '隐秘星图 · 连贯版' },
   rain: { file: '02-rain-on-concrete', title: '混凝土上的雨' },
   signal: { file: '03-signal-drift', title: '信号漂流' },
   archive: { file: '04-archive-room', title: '档案室' },
